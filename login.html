@@ -11,11 +11,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             background: #0a0a0f;
             font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
@@ -35,10 +31,7 @@
             background: radial-gradient(circle at 20% 50%, rgba(194,49,82,0.08) 0%, transparent 50%);
             animation: rotate 20s linear infinite;
         }
-        @keyframes rotate {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
+        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         .login-box {
             background: rgba(15, 15, 24, 0.95);
             backdrop-filter: blur(20px);
@@ -52,16 +45,7 @@
             z-index: 1;
             animation: fadeInUp 0.5s ease;
         }
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
         .login-box h1 {
             color: #ffffff;
             margin-bottom: 10px;
@@ -71,23 +55,9 @@
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
-        .login-box .subtitle {
-            color: #7a7a9a;
-            font-size: 13px;
-            margin-bottom: 30px;
-        }
-        .input-group {
-            position: relative;
-            margin-bottom: 20px;
-        }
-        .input-group i {
-            position: absolute;
-            left: 16px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #c23152;
-            font-size: 16px;
-        }
+        .login-box .subtitle { color: #7a7a9a; font-size: 13px; margin-bottom: 30px; }
+        .input-group { position: relative; margin-bottom: 20px; }
+        .input-group i { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: #c23152; font-size: 16px; }
         .login-box input {
             width: 100%;
             padding: 14px 16px 14px 44px;
@@ -99,10 +69,7 @@
             outline: none;
             transition: all 0.2s;
         }
-        .login-box input:focus {
-            border-color: #c23152;
-            box-shadow: 0 0 0 2px rgba(194,49,82,0.2);
-        }
+        .login-box input:focus { border-color: #c23152; box-shadow: 0 0 0 2px rgba(194,49,82,0.2); }
         .login-box button {
             width: 100%;
             padding: 14px;
@@ -119,33 +86,18 @@
             justify-content: center;
             gap: 8px;
         }
-        .login-box button:hover {
-            transform: scale(1.02);
-            box-shadow: 0 4px 12px rgba(194,49,82,0.4);
-        }
-        .login-box button:active {
-            transform: scale(0.98);
-        }
-        .error {
-            color: #e94560;
-            margin-top: 20px;
-            font-size: 13px;
-            background: rgba(233,69,96,0.1);
-            padding: 10px;
-            border-radius: 10px;
-            border: 1px solid rgba(233,69,96,0.2);
-        }
-        .footer {
-            margin-top: 20px;
-            font-size: 11px;
-            color: #4a4a6a;
-        }
+        .login-box button:hover { transform: scale(1.02); box-shadow: 0 4px 12px rgba(194,49,82,0.4); }
+        .login-box button:active { transform: scale(0.98); }
+        .error { color: #e94560; margin-top: 20px; font-size: 13px; background: rgba(233,69,96,0.1); padding: 10px; border-radius: 10px; border: 1px solid rgba(233,69,96,0.2); }
+        .footer { margin-top: 20px; font-size: 11px; color: #4a4a6a; }
     </style>
 </head>
 <body>
     <div class="login-box">
         <h1><i class="fas fa-robot"></i> RobyCord</h1>
         <div class="subtitle">Self-Bot Dashboard</div>
+        <!-- 🔴 AICI e SINGURA MODIFICARE: setează adresa serverului tău de pe SparkedHost -->
+        <!-- 🔴 Trebuie să înlocuiești "45.43.163.222:8098" cu datele tale reale -->
         <form method="post" action="http://45.43.163.222:8098/login">
             <div class="input-group">
                 <i class="fas fa-lock"></i>
@@ -153,12 +105,8 @@
             </div>
             <button type="submit"><i class="fas fa-arrow-right-to-bracket"></i> Login</button>
         </form>
-        <div class="footer">
-            <i class="fas fa-shield-alt"></i> Secure Connection
-        </div>
+        <div class="footer"><i class="fas fa-shield-alt"></i> Secure Connection</div>
     </div>
-    <script>
-        document.querySelector('input').focus();
-    </script>
+    <script> document.querySelector('input').focus(); </script>
 </body>
 </html>
