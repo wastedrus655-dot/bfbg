@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>RobyCord - Login</title>
     <style>
-        /* --- Stilurile tale existente (le poți păstra pe aceleași) --- */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             background: #0a0a0f;
@@ -15,54 +14,35 @@
             justify-content: center;
             align-items: center;
             padding: 20px;
-            position: relative;
-            overflow: hidden;
         }
-        body::before {
-            content: '';
-            position: absolute;
-            width: 150%;
-            height: 150%;
-            background: radial-gradient(circle at 20% 50%, rgba(194,49,82,0.08) 0%, transparent 50%);
-            animation: rotate 20s linear infinite;
-        }
-        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         .login-box {
-            background: rgba(15, 15, 24, 0.95);
-            backdrop-filter: blur(20px);
+            background: #0f0f18;
             padding: 40px;
-            border-radius: 32px;
-            width: 340px;
+            border-radius: 28px;
+            width: 320px;
             text-align: center;
             border: 1px solid rgba(194,49,82,0.3);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
-            position: relative;
-            z-index: 1;
-            animation: fadeInUp 0.5s ease;
         }
-        @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
         .login-box h1 {
             color: #ffffff;
-            margin-bottom: 10px;
-            font-size: 32px;
+            margin-bottom: 30px;
+            font-size: 28px;
             background: linear-gradient(135deg, #fff, #c23152);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
-        .login-box .subtitle { color: #7a7a9a; font-size: 13px; margin-bottom: 30px; }
-        .input-group { position: relative; margin-bottom: 20px; }
-        .input-group i { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: #c23152; font-size: 16px; }
         .login-box input {
             width: 100%;
-            padding: 14px 16px 14px 44px;
+            padding: 14px 16px;
             border-radius: 14px;
             border: 1px solid rgba(194,49,82,0.3);
             background: #08080c;
             color: #ffffff;
-            font-size: 15px;
+            font-size: 16px;
+            margin-bottom: 20px;
             outline: none;
         }
-        .login-box input:focus { border-color: #c23152; box-shadow: 0 0 0 2px rgba(194,49,82,0.2); }
+        .login-box input:focus { border-color: #c23152; }
         .login-box button {
             width: 100%;
             padding: 14px;
@@ -73,82 +53,31 @@
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
         }
-        .login-box button:hover { transform: scale(1.02); box-shadow: 0 4px 12px rgba(194,49,82,0.4); }
-        .error { color: #e94560; margin-top: 20px; font-size: 13px; background: rgba(233,69,96,0.1); padding: 10px; border-radius: 10px; display: none; }
-        .footer { margin-top: 20px; font-size: 11px; color: #4a4a6a; }
-        .loading { display: none; margin-top: 15px; color: #c23152; font-size: 13px; }
+        .error { color: #e94560; margin-top: 20px; font-size: 14px; }
     </style>
 </head>
 <body>
     <div class="login-box">
-        <h1><i class="fas fa-robot"></i> RobyCord</h1>
-        <div class="subtitle">Self-Bot Dashboard</div>
-        <div class="input-group">
-            <i>🔒</i>
-            <input type="password" id="password" placeholder="Enter password" autocomplete="off" autofocus>
-        </div>
-        <button onclick="login()"><i class="fas fa-arrow-right-to-bracket"></i> Login</button>
+        <h1>RobyCord</h1>
+        <input type="password" id="password" placeholder="Enter password" autocomplete="off">
+        <button onclick="login()">Login</button>
         <div id="error" class="error"></div>
-        <div id="loading" class="loading">⏳ Logging in...</div>
-        <div class="footer"><i class="fas fa-shield-alt"></i> Secure Connection</div>
     </div>
-
     <script>
-        const API_BASE_URL = "http://45.43.163.222:8098"; // 🔴 Înlocuiește cu IP-ul tău real
-
-        async function login() {
-            const password = document.getElementById('password').value;
+        const PASSWORD = "55Fxvg7t";
+        
+        function login() {
+            const pass = document.getElementById('password').value;
             const errorDiv = document.getElementById('error');
-            const loadingDiv = document.getElementById('loading');
-            const loginBtn = document.querySelector('button');
-
-            if (!password) {
-                errorDiv.innerText = 'Please enter the password';
-                errorDiv.style.display = 'block';
-                return;
-            }
-
-            errorDiv.style.display = 'none';
-            loadingDiv.style.display = 'block';
-            loginBtn.disabled = true;
-
-            try {
-                // 1. Încearcă să te autentifici și să salvezi sesiunea
-                const loginRes = await fetch(`${API_BASE_URL}/login`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: new URLSearchParams({ password: password })
-                });
-
-                if (loginRes.ok) {
-                    // 2. După autentificare, încearcă să accesezi chat-ul
-                    window.location.href = '/';
-                } else {
-                    const text = await loginRes.text();
-                    if (text.includes('Wrong password')) {
-                        errorDiv.innerText = 'Wrong password';
-                    } else {
-                        errorDiv.innerText = 'Login failed';
-                    }
-                    errorDiv.style.display = 'block';
-                    loadingDiv.style.display = 'none';
-                    loginBtn.disabled = false;
-                }
-            } catch (err) {
-                errorDiv.innerText = 'Cannot connect to server. Make sure the bot is running.';
-                errorDiv.style.display = 'block';
-                loadingDiv.style.display = 'none';
-                loginBtn.disabled = false;
-                console.error(err);
+            
+            if (pass === PASSWORD) {
+                window.location.href = 'index.html';
+            } else {
+                errorDiv.innerText = 'Wrong password';
             }
         }
-
+        
         document.getElementById('password').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') login();
         });
