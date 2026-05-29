@@ -11,8 +11,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
-        /* --- AICI PUI TOT CSS-UL TAU (la fel ca înainte) --- */
-        /* --- (Ca să păstrăm răspunsul ordonat, nu îl mai copiez integral, dar știi tu care e) --- */
         * {
             margin: 0;
             padding: 0;
@@ -485,13 +483,10 @@
         </div>
     </div>
 
-    <!-- Say Modal -->
     <div class="modal" id="sayModal">
         <div class="modal-content">
             <h3><i class="fas fa-paper-plane"></i> Send Message</h3>
-            <select id="sayTokenSelect">
-                <option value="">Loading tokens...</option>
-            </select>
+            <select id="sayTokenSelect"><option value="">Loading tokens...</option></select>
             <input type="text" id="sayChannelId" placeholder="Channel ID" autocomplete="off">
             <input type="text" id="sayReplyUserId" placeholder="Reply to User ID (optional)" autocomplete="off">
             <textarea id="sayMessage" placeholder="Message to send..."></textarea>
@@ -526,9 +521,8 @@
     </div>
 
     <script>
-        // 🔴 AICI e SINGURA MODIFICARE: setează adresa serverului tău de pe SparkedHost
-        // 🔴 Trebuie să înlocuiești "45.43.163.222:8098" cu datele tale reale
         const API_BASE_URL = "http://45.43.163.222:8098";
+        const PASSWORD = "55Fxvg7t";
         
         let botName = localStorage.getItem('bot_name') || 'RobyCord';
         let avatarUrl = localStorage.getItem('bot_avatar') || null;
@@ -630,7 +624,7 @@
         
         async function loadTokensForSay() {
             try {
-                const res = await fetch(`${API_BASE_URL}/api/tokens/list`);
+                const res = await fetch(`${API_BASE_URL}/api/tokens/list?password=${PASSWORD}`);
                 const data = await res.json();
                 const select = document.getElementById('sayTokenSelect');
                 select.innerHTML = '<option value="">Select token...</option>';
@@ -687,7 +681,7 @@
             }
             
             try {
-                const res = await fetch(`${API_BASE_URL}/api/say/send`, {
+                const res = await fetch(`${API_BASE_URL}/api/say/send?password=${PASSWORD}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -793,7 +787,7 @@
             await new Promise(resolve => setTimeout(resolve, 3000));
             
             try {
-                const res = await fetch(`${API_BASE_URL}/api/chat`, {
+                const res = await fetch(`${API_BASE_URL}/api/chat?password=${PASSWORD}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ message: text })
@@ -815,7 +809,7 @@
         
         async function updateStatus() {
             try {
-                const res = await fetch(`${API_BASE_URL}/api/status`);
+                const res = await fetch(`${API_BASE_URL}/api/status?password=${PASSWORD}`);
                 const data = await res.json();
                 document.getElementById('task-count').textContent = data.active_tasks || 0;
                 document.getElementById('token-count').textContent = data.tokens || 0;
