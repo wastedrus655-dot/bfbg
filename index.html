@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="RobyCord">
+    <meta name="theme-color" content="#08080c">
+    <title>RobyCord</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0a0a0f;
+            font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
+            padding: 0;
+            margin: 0;
+            -webkit-tap-highlight-color: transparent;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            overflow: hidden;
+        }
+
+        .app-container {
+            width: 100%;
+            height: 100%;
+            background: #08080c;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        @media (min-width: 768px) {
+            body {
+                position: relative;
+                overflow: auto;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+            .app-container {
+                max-width: 500px;
+                height: 90vh;
+                border-radius: 32px;
+                box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5), 0 0 0 1px rgba(233,69,96,0.1);
+            }
+        }
+
+        .header {
+            background: rgba(8, 8, 12, 0.95);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            padding: 10px 16px;
+            padding-top: max(10px, env(safe-area-inset-top));
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 0.5px solid rgba(194, 49, 82, 0.3);
+            flex-shrink: 0;
+        }
+
+        .avatar-wrapper {
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .avatar-wrapper:active { transform: scale(0.95); }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #c23152, #8a153a);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            box-shadow: 0 2px 8px rgba(194, 49, 82, 0.3);
+            overflow: hidden;
+        }
+
+        .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .avatar-edit {
+            position: absolute;
+            bottom: -2px;
+            right: -2px;
+            background: #c23152;
+            border-radius: 50%;
+            width: 14px;
+            height: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 7px;
+            color: white;
+            border: 2px solid #08080c;
+        }
+
+        .header-info { flex: 1; }
+        .bot-name {
+            font-size: 17px;
+            font-weight: 600;
+            color: #ffffff;
+            cursor: pointer;
+            display: inline-block;
+        }
+        .bot-name-edit {
+            display: inline-block;
+            margin-left: 6px;
+            font-size: 11px;
+            color: #7a7a9a;
+            cursor: pointer;
+            opacity: 0.7;
+        }
+        .status-text {
+            font-size: 11px;
+            color: #00b894;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-top: 2px;
+        }
+        .status-text i { font-size: 8px; }
+
+        .say-btn {
+            background: linear-gradient(135deg, #c23152, #8a153a);
+            border: none;
+            border-radius: 24px;
+            padding: 8px 16px;
+            font-size: 13px;
+            font-weight: 600;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.2s;
+            box-shadow: 0 2px 8px rgba(194,49,82,0.3);
+        }
+        .say-btn:hover {
+            transform: scale(1.02);
+            background: linear-gradient(135deg, #d93a60, #a01a3a);
+        }
+        .say-btn:active {
+            transform: scale(0.98);
+        }
+        .say-btn i {
+            font-size: 14px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.95);
+            backdrop-filter: blur(20px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background: #0f0f18;
+            border-radius: 28px;
+            padding: 28px;
+            width: 340px;
+            text-align: center;
+            border: 1px solid rgba(194,49,82,0.3);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        }
+        .modal-content h3 {
+            color: #ffffff;
+            margin-bottom: 20px;
+            font-size: 20px;
+            font-weight: 600;
+        }
+        .modal-content select,
+        .modal-content input,
+        .modal-content textarea {
+            width: 100%;
+            padding: 12px 14px;
+            border-radius: 14px;
+            border: 1px solid rgba(194,49,82,0.3);
+            background: #08080c;
+            color: #ffffff;
+            font-size: 14px;
+            margin-bottom: 14px;
+            outline: none;
+            font-family: inherit;
+        }
+        .modal-content select:focus,
+        .modal-content input:focus,
+        .modal-content textarea:focus {
+            border-color: #c23152;
+        }
+        .modal-content textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 8px;
+        }
+        .modal-buttons button {
+            flex: 1;
+            padding: 12px;
+            border-radius: 24px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: 0.2s;
+        }
+        .save-btn {
+            background: linear-gradient(135deg, #c23152, #8a153a);
+            color: white;
+        }
+        .save-btn:hover {
+            transform: scale(1.02);
+        }
+        .cancel-btn {
+            background: #1a1a24;
+            color: #a0a0c0;
+        }
+        .cancel-btn:hover {
+            background: #2a2a3e;
+        }
+        .result-text {
+            margin-top: 16px;
+            padding: 10px;
+            border-radius: 12px;
+            font-size: 13px;
+            text-align: center;
+            display: none;
+        }
+        .result-text.success {
+            background: rgba(0,184,148,0.15);
+            color: #00b894;
+            border: 1px solid rgba(0,184,148,0.3);
+        }
+        .result-text.error {
+            background: rgba(233,69,96,0.15);
+            color: #e94560;
+            border: 1px solid rgba(233,69,96,0.3);
+        }
+
+        .status-bar {
+            padding: 8px 16px;
+            background: #0c0c12;
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            font-weight: 500;
+            border-bottom: 0.5px solid rgba(255,255,255,0.05);
+            flex-shrink: 0;
+        }
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #7a7a9a;
+        }
+        .status-item i { font-size: 11px; color: #c23152; }
+
+        .chat {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            background: #08080c;
+            -webkit-overflow-scrolling: touch;
+        }
+        .chat::-webkit-scrollbar { width: 3px; }
+        .chat::-webkit-scrollbar-track { background: #0c0c12; }
+        .chat::-webkit-scrollbar-thumb { background: #c23152; border-radius: 10px; }
+
+        .msg-wrapper {
+            display: flex;
+            gap: 10px;
+            animation: slideIn 0.25s ease;
+        }
+        .msg-wrapper.user { justify-content: flex-end; }
+        .msg-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #0f0f18;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+        .msg-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .msg-avatar i { font-size: 16px; color: #c23152; }
+        .msg-content { max-width: 75%; }
+        .msg-name {
+            font-size: 10px;
+            font-weight: 600;
+            margin-bottom: 3px;
+            padding-left: 4px;
+            color: #5a5a7a;
+        }
+        .msg-bubble {
+            padding: 10px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            line-height: 1.45;
+            word-wrap: break-word;
+        }
+        .msg-wrapper.user .msg-content { text-align: right; }
+        .msg-wrapper.user .msg-bubble {
+            background: linear-gradient(135deg, #c23152, #8a153a);
+            color: #ffffff;
+            border-bottom-right-radius: 4px;
+        }
+        .msg-wrapper.bot .msg-bubble {
+            background: #0f0f18;
+            color: #e0e0e0;
+            border-bottom-left-radius: 4px;
+            border: 0.5px solid rgba(194, 49, 82, 0.2);
+        }
+        .msg-bubble code {
+            background: #08080c;
+            padding: 2px 6px;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 11px;
+            color: #e94560;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .typing {
+            align-self: flex-start;
+            padding: 8px 14px;
+            background: #0f0f18;
+            border-radius: 20px;
+            display: none;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            color: #7a7a9a;
+            margin-left: 48px;
+            margin-bottom: 8px;
+            border: 0.5px solid rgba(194, 49, 82, 0.2);
+        }
+        .typing.show { display: flex; }
+        .typing-dot { display: flex; gap: 3px; }
+        .typing-dot span {
+            width: 5px;
+            height: 5px;
+            background: #c23152;
+            border-radius: 50%;
+            animation: pulse 1.4s infinite;
+        }
+        .typing-dot span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot span:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes pulse {
+            0%,60%,100% { transform: scale(1); opacity: 0.4; }
+            30% { transform: scale(1.2); opacity: 1; }
+        }
+
+        .input-area {
+            padding: 10px 16px;
+            padding-bottom: max(10px, env(safe-area-inset-bottom));
+            background: #0c0c12;
+            display: flex;
+            gap: 10px;
+            border-top: 0.5px solid rgba(194, 49, 82, 0.2);
+            flex-shrink: 0;
+        }
+        .input-area input {
+            flex: 1;
+            padding: 12px 16px;
+            border-radius: 30px;
+            border: 0.5px solid rgba(194, 49, 82, 0.3);
+            background: #08080c;
+            color: #ffffff;
+            font-size: 15px;
+            outline: none;
+        }
+        .input-area input:focus { border-color: #c23152; }
+        .input-area input::placeholder { color: #4a4a6a; }
+        .input-area button {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: none;
+            background: linear-gradient(135deg, #c23152, #8a153a);
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s;
+        }
+        .input-area button:active { transform: scale(0.94); }
+        .input-area button i { font-size: 16px; }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="header">
+            <div class="avatar-wrapper" onclick="openAvatarModal()">
+                <div class="avatar" id="avatar">
+                    <i class="fas fa-robot" id="avatarIcon"></i>
+                    <img id="avatarImg" style="display:none;" alt="avatar">
+                </div>
+                <div class="avatar-edit"><i class="fas fa-pen"></i></div>
+            </div>
+            <div class="header-info">
+                <div>
+                    <span class="bot-name" id="botName" onclick="openNameModal()">RobyCord</span>
+                    <i class="fas fa-pen bot-name-edit" onclick="openNameModal()"></i>
+                </div>
+                <div class="status-text">
+                    <i class="fas fa-circle"></i> online
+                </div>
+            </div>
+            <div class="say-btn" onclick="openSayModal()">
+                <i class="fas fa-paper-plane"></i> Say
+            </div>
+        </div>
+
+        <div class="status-bar">
+            <div class="status-item"><i class="fas fa-tasks"></i><span id="task-count">0</span> tasks</div>
+            <div class="status-item"><i class="fas fa-key"></i><span id="token-count">0</span> tokens</div>
+        </div>
+
+        <div class="chat" id="chat">
+            <div class="msg-wrapper bot">
+                <div class="msg-avatar" id="botMsgAvatar">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <div class="msg-content">
+                    <div class="msg-name" id="botMsgName">RobyCord</div>
+                    <div class="msg-bubble">
+                        <i class="fas fa-smile-wink"></i> <b>Welcome!</b><br><br>
+                        Type <code>help</code> for commands.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="typing" id="typing">
+            <i class="fas fa-brain"></i> <span id="typingName">RobyCord</span> typing
+            <div class="typing-dot"><span></span><span></span><span></span></div>
+        </div>
+
+        <div class="input-area">
+            <input type="text" id="input" placeholder="Type a command..." autocomplete="off">
+            <button onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
+        </div>
+    </div>
+
+    <!-- Say Modal -->
+    <div class="modal" id="sayModal">
+        <div class="modal-content">
+            <h3><i class="fas fa-paper-plane"></i> Send Message</h3>
+            <select id="sayTokenSelect">
+                <option value="">Loading tokens...</option>
+            </select>
+            <input type="text" id="sayChannelId" placeholder="Channel ID" autocomplete="off">
+            <input type="text" id="sayReplyUserId" placeholder="Reply to User ID (optional)" autocomplete="off">
+            <textarea id="sayMessage" placeholder="Message to send..."></textarea>
+            <div class="modal-buttons">
+                <button class="save-btn" onclick="sendSayMessage()">Send</button>
+                <button class="cancel-btn" onclick="closeSayModal()">Cancel</button>
+            </div>
+            <div id="sayResult" class="result-text"></div>
+        </div>
+    </div>
+
+    <div class="modal" id="nameModal">
+        <div class="modal-content">
+            <h3><i class="fas fa-pen"></i> Change Name</h3>
+            <input type="text" id="newNameInput" placeholder="New name">
+            <div class="modal-buttons">
+                <button class="save-btn" onclick="saveName()">Save</button>
+                <button class="cancel-btn" onclick="closeNameModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="avatarModal">
+        <div class="modal-content">
+            <h3><i class="fas fa-image"></i> Change Avatar</h3>
+            <input type="text" id="avatarUrlInput" placeholder="Image URL (https://...)">
+            <div class="modal-buttons" style="margin-top: 8px;">
+                <button class="save-btn" onclick="saveAvatar()">Save</button>
+                <button class="cancel-btn" onclick="closeAvatarModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ⚠️ INLOCUIESTE CU IP-UL VPS-ULUI TAU (hostul principal)
+        const API_BASE_URL = "http://IP_TAU_VPS:8098";
+        
+        let botName = localStorage.getItem('bot_name') || 'RobyCord';
+        let avatarUrl = localStorage.getItem('bot_avatar') || null;
+        
+        function updateUI() {
+            document.getElementById('botName').innerText = botName;
+            document.getElementById('typingName').innerText = botName;
+            
+            document.querySelectorAll('.msg-wrapper.bot .msg-name').forEach(el => {
+                if (el.id !== 'botMsgName') el.innerText = botName;
+            });
+            const botMsgName = document.getElementById('botMsgName');
+            if (botMsgName) botMsgName.innerText = botName;
+            
+            const avatarDiv = document.getElementById('avatar');
+            const avatarIcon = document.getElementById('avatarIcon');
+            const avatarImg = document.getElementById('avatarImg');
+            
+            if (avatarUrl && avatarUrl.startsWith('http')) {
+                avatarIcon.style.display = 'none';
+                avatarImg.style.display = 'block';
+                avatarImg.src = avatarUrl;
+            } else {
+                avatarIcon.style.display = 'flex';
+                avatarImg.style.display = 'none';
+            }
+            
+            document.querySelectorAll('.msg-wrapper.bot .msg-avatar').forEach(avatar => {
+                const existingImg = avatar.querySelector('img');
+                const existingIcon = avatar.querySelector('i');
+                if (avatarUrl && avatarUrl.startsWith('http')) {
+                    if (existingImg) {
+                        existingImg.src = avatarUrl;
+                        existingImg.style.display = 'block';
+                    } else {
+                        const newImg = document.createElement('img');
+                        newImg.src = avatarUrl;
+                        avatar.innerHTML = '';
+                        avatar.appendChild(newImg);
+                    }
+                    if (existingIcon) existingIcon.style.display = 'none';
+                } else {
+                    if (existingImg) existingImg.style.display = 'none';
+                    if (existingIcon) {
+                        existingIcon.style.display = 'flex';
+                    } else {
+                        const newIcon = document.createElement('i');
+                        newIcon.className = 'fas fa-robot';
+                        avatar.innerHTML = '';
+                        avatar.appendChild(newIcon);
+                    }
+                }
+            });
+        }
+        
+        function openNameModal() {
+            document.getElementById('newNameInput').value = botName;
+            document.getElementById('nameModal').style.display = 'flex';
+        }
+        
+        function closeNameModal() {
+            document.getElementById('nameModal').style.display = 'none';
+        }
+        
+        function saveName() {
+            const newName = document.getElementById('newNameInput').value.trim();
+            if (newName) {
+                botName = newName;
+                localStorage.setItem('bot_name', botName);
+                updateUI();
+            }
+            closeNameModal();
+        }
+        
+        function openAvatarModal() {
+            document.getElementById('avatarUrlInput').value = avatarUrl || '';
+            document.getElementById('avatarModal').style.display = 'flex';
+        }
+        
+        function closeAvatarModal() {
+            document.getElementById('avatarModal').style.display = 'none';
+        }
+        
+        function saveAvatar() {
+            const url = document.getElementById('avatarUrlInput').value.trim();
+            if (url && url.startsWith('http')) {
+                avatarUrl = url;
+                localStorage.setItem('bot_avatar', avatarUrl);
+                updateUI();
+            } else if (!url) {
+                avatarUrl = null;
+                localStorage.removeItem('bot_avatar');
+                updateUI();
+            } else {
+                alert('Enter a valid URL');
+            }
+            closeAvatarModal();
+        }
+        
+        async function loadTokensForSay() {
+            try {
+                const res = await fetch(`${API_BASE_URL}/api/tokens/list`);
+                const data = await res.json();
+                const select = document.getElementById('sayTokenSelect');
+                select.innerHTML = '<option value="">Select token...</option>';
+                if (data.tokens && data.tokens.length > 0) {
+                    data.tokens.forEach((token) => {
+                        const option = document.createElement('option');
+                        option.value = token.nr;
+                        option.textContent = `${token.nr}. ${token.username}`;
+                        select.appendChild(option);
+                    });
+                } else {
+                    select.innerHTML = '<option value="">No tokens found</option>';
+                }
+            } catch(e) {
+                console.error(e);
+            }
+        }
+        
+        function openSayModal() {
+            loadTokensForSay();
+            document.getElementById('sayModal').style.display = 'flex';
+            document.getElementById('sayChannelId').value = '';
+            document.getElementById('sayReplyUserId').value = '';
+            document.getElementById('sayMessage').value = '';
+            document.getElementById('sayResult').className = 'result-text';
+            document.getElementById('sayResult').style.display = 'none';
+        }
+        
+        function closeSayModal() {
+            document.getElementById('sayModal').style.display = 'none';
+        }
+        
+        async function sendSayMessage() {
+            const tokenNr = document.getElementById('sayTokenSelect').value;
+            const channelId = document.getElementById('sayChannelId').value;
+            const replyUserId = document.getElementById('sayReplyUserId').value;
+            const message = document.getElementById('sayMessage').value;
+            const resultDiv = document.getElementById('sayResult');
+            
+            if (!tokenNr || !channelId || !message) {
+                resultDiv.className = 'result-text error';
+                resultDiv.style.display = 'block';
+                resultDiv.innerHTML = 'Please fill all fields';
+                return;
+            }
+            
+            resultDiv.className = 'result-text';
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = '⏳ Sending...';
+            
+            let finalMessage = message;
+            if (replyUserId) {
+                finalMessage = `<@${replyUserId}> ${message}`;
+            }
+            
+            try {
+                const res = await fetch(`${API_BASE_URL}/api/say/send`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        token_nr: parseInt(tokenNr),
+                        channel_id: channelId,
+                        message: finalMessage
+                    })
+                });
+                const data = await res.json();
+                
+                if (data.success) {
+                    resultDiv.className = 'result-text success';
+                    resultDiv.innerHTML = '✓ ' + data.message;
+                    document.getElementById('sayMessage').value = '';
+                    setTimeout(() => {
+                        resultDiv.style.display = 'none';
+                    }, 2000);
+                } else {
+                    resultDiv.className = 'result-text error';
+                    resultDiv.innerHTML = '✗ ' + data.error;
+                }
+            } catch(e) {
+                resultDiv.className = 'result-text error';
+                resultDiv.innerHTML = '✗ Connection error';
+            }
+        }
+        
+        const chat = document.getElementById('chat');
+        const input = document.getElementById('input');
+        const typingDiv = document.getElementById('typing');
+        
+        input.addEventListener('keydown', (e) => { if (e.key === 'Enter') sendMessage(); });
+        
+        function addBotMessage(text) {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'msg-wrapper bot';
+            
+            const avatarDiv = document.createElement('div');
+            avatarDiv.className = 'msg-avatar';
+            if (avatarUrl && avatarUrl.startsWith('http')) {
+                const img = document.createElement('img');
+                img.src = avatarUrl;
+                avatarDiv.appendChild(img);
+            } else {
+                const icon = document.createElement('i');
+                icon.className = 'fas fa-robot';
+                avatarDiv.appendChild(icon);
+            }
+            
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'msg-content';
+            
+            const nameDiv = document.createElement('div');
+            nameDiv.className = 'msg-name';
+            nameDiv.innerText = botName;
+            
+            const bubbleDiv = document.createElement('div');
+            bubbleDiv.className = 'msg-bubble';
+            let formattedText = text
+                .replace(/\n/g, '<br>')
+                .replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')
+                .replace(/`(.*?)`/g, '<code>$1</code>');
+            bubbleDiv.innerHTML = formattedText;
+            
+            contentDiv.appendChild(nameDiv);
+            contentDiv.appendChild(bubbleDiv);
+            wrapper.appendChild(avatarDiv);
+            wrapper.appendChild(contentDiv);
+            chat.appendChild(wrapper);
+            chat.scrollTop = chat.scrollHeight;
+        }
+        
+        function addUserMessage(text) {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'msg-wrapper user';
+            
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'msg-content';
+            
+            const nameDiv = document.createElement('div');
+            nameDiv.className = 'msg-name';
+            nameDiv.innerText = 'You';
+            
+            const bubbleDiv = document.createElement('div');
+            bubbleDiv.className = 'msg-bubble';
+            bubbleDiv.innerHTML = text.replace(/\n/g, '<br>');
+            
+            contentDiv.appendChild(nameDiv);
+            contentDiv.appendChild(bubbleDiv);
+            wrapper.appendChild(contentDiv);
+            chat.appendChild(wrapper);
+            chat.scrollTop = chat.scrollHeight;
+        }
+        
+        async function sendMessage() {
+            const text = input.value.trim();
+            if (!text) return;
+            addUserMessage(text);
+            input.value = '';
+            
+            typingDiv.classList.add('show');
+            
+            await new Promise(resolve => setTimeout(resolve, 3000));
+            
+            try {
+                const res = await fetch(`${API_BASE_URL}/api/chat`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: text })
+                });
+                const data = await res.json();
+                typingDiv.classList.remove('show');
+                if (data.response === 'CLEAR_CHAT') {
+                    chat.innerHTML = '';
+                    addBotMessage('Chat cleared.');
+                } else {
+                    addBotMessage(data.response);
+                }
+                updateStatus();
+            } catch(err) {
+                typingDiv.classList.remove('show');
+                addBotMessage('Connection error.');
+            }
+        }
+        
+        async function updateStatus() {
+            try {
+                const res = await fetch(`${API_BASE_URL}/api/status`);
+                const data = await res.json();
+                document.getElementById('task-count').textContent = data.active_tasks || 0;
+                document.getElementById('token-count').textContent = data.tokens || 0;
+            } catch(e) {}
+        }
+        
+        updateUI();
+        updateStatus();
+        setInterval(updateStatus, 3000);
+        
+        window.onclick = function(e) {
+            if (e.target.classList.contains('modal')) {
+                e.target.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
